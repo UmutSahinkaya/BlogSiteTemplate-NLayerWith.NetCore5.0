@@ -26,8 +26,25 @@ namespace ProgrammersBlog.Mvc
                 opt.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
                 opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve;
             });
+            services.AddSession();
             services.AddAutoMapper(typeof(CategoryProfile),typeof(ArticleProfile));
             services.LoadMyServices();
+            //Cookie ayar kýsmý
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = new PathString("/Admin/User/Login");
+                options.LogoutPath = new PathString("/Admin/User/Logout");
+                options.Cookie = new CookieBuilder
+                {
+                    Name="ProgrammersBlog",
+                    HttpOnly=true,//Sadece http üzerinden gönderiliyor server side da yapýlýyor!
+                    SameSite=SameSiteMode.Strict,//Cookie bilgilerinin sadece kendi sitemizden geldiðinde iþlenmesini saðlayacaktýr
+                    SecurePolicy=CookieSecurePolicy.SameAsRequest//Daima ALWAYS kullanýlmalýdýr daha güveni olur.
+                };
+                options.SlidingExpiration = true;//kullanýcýya zaman tanýmak
+                options.ExpireTimeSpan=System.TimeSpan.FromDays(7);
+                options.AccessDeniedPath = new PathString("/Admin/User/AccessDenied");
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -39,8 +56,12 @@ namespace ProgrammersBlog.Mvc
                 app.UseStatusCodePages();
             }
 
+            app.UseSession();
             app.UseStaticFiles();
             app.UseRouting();
+
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

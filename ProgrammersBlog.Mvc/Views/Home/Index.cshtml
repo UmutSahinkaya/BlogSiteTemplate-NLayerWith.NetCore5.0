@@ -1,2 +1,10 @@
-﻿<h1>Burası Blog Area, Buraya Hoş Geldiniz.</h1>
+﻿
+@model ProgrammersBlog.Mvc.Models.DenemeModel
+<h1>Burası Blog Area, Buraya Hoş Geldiniz.</h1>
 <a asp-area="Admin" asp-controller="Home" asp-action="Index">Admin Area Kısmına Geçmek İçin Lütfen Tıklayınız.</a>
+
+
+@foreach (var item in Model.ArticleList)
+{
+    <h1>@item.SeoAuthor</h1>
+}
